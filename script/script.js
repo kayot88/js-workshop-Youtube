@@ -181,20 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // modal
   {
-    // document.body.insertAdjacentHTML(
-    //   'beforeend',
-    //   `
-    // <div className="youTuberModal">
-    //   <div id="youtuberClose">&#215</div>
-    //   <div id="youtuberContainer"></div>
-    // </div>
-    // `
-    // );
     const divYoutuber = document.querySelector('.youTuberModal');
-    console.log(divYoutuber);
+    // console.log(divYoutuber);
     const youtuberContainer = document.getElementById('youtuberContainer')
     ;
-    console.log(youtuberContainer);
+    // console.log(youtuberContainer);
     const youtuberClose = document.getElementById('youtuberClose');
     const youtuberItems = document.querySelectorAll('[data-youtuber]');
 
