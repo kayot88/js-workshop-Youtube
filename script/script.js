@@ -183,8 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
   {
     const divYoutuber = document.querySelector('.youTuberModal');
     // console.log(divYoutuber);
-    const youtuberContainer = document.getElementById('youtuberContainer')
-    ;
+    const youtuberContainer = document.getElementById('youtuberContainer');
     // console.log(youtuberContainer);
     const youtuberClose = document.getElementById('youtuberClose');
     const youtuberItems = document.querySelectorAll('[data-youtuber]');
@@ -192,20 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const qw = [3840, 2560, 1920, 1280, 854, 640, 426, 256];
     const qh = [2160, 1440, 1080, 720, 480, 360, 240, 144];
 
-    youtuberItems.forEach(elem => {
-      elem.addEventListener('click', () => {
-        const idVideo = elem.dataset.youtuber;
-        divYoutuber.style.display = 'block';
-        const youTuberFrame = document.createElement('iframe');
-        youTuberFrame.src = `https://youtube.com/embed/${idVideo}`;
-        youtuberContainer.insertAdjacentElement('beforebegin', youTuberFrame);
-        sizeVideo();
-      });
-    });
-    youtuberClose.addEventListener('click', () => {
-      divYoutuber.style.display = '';
-      youtuberContainer.textContent = '';
-    });
     const sizeVideo = () => {
       let vw = document.documentElement.clientWidth;
       let vh = document.documentElement.clientHeight;
@@ -218,12 +203,35 @@ document.addEventListener('DOMContentLoaded', () => {
           youtuberContainer.style.cssText = `
          width: ${qw[index]}px;
          height:${qh[index]}px;
-         top: ${(vh - qh[index])/2}px;
-         left: ${(vw - qw[index])/2}px;
+         top: ${(vh - qh[index]) / 2}px;
+         left: ${(vw - qw[index]) / 2}px;
          `;
           break;
         }
       }
     };
+
+    youtuberItems.forEach(elem => {
+      elem.addEventListener('click', () => {
+        const idVideo = elem.dataset.youtuber;
+        divYoutuber.style.display = 'block';
+        const youTuberFrame = document.createElement('iframe');
+        youTuberFrame.src = `https://youtube.com/embed/${idVideo}`;
+        youtuberContainer.insertAdjacentElement('beforeend', youTuberFrame);
+        window.addEventListener('resize', sizeVideo);
+        sizeVideo();
+      });
+    });
+    youtuberClose.addEventListener('click', () => {
+      divYoutuber.style.display = '';
+      youtuberContainer.textContent = '';
+      window.removeEventListener('resize', sizeVideo);
+    });
+  }
+  // youtube api
+  {
+    const API_KEY = 'AIzaSyDOc9wZYiYfHt6Ln_n9_eIxJrlke6RYQwo';
+    const AUTH_ID =
+      '564463627171-7i1scqci790mh9q2qg09hga9neii733v.apps.googleusercontent.com';
   }
 });
