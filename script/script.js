@@ -232,9 +232,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // youtube api
   {
-    const API_KEY = "AIzaSyDOc9wZYiYfHt6Ln_n9_eIxJrlke6RYQwo";
-    const AUTH_ID =
-      "564463627171-7i1scqci790mh9q2qg09hga9neii733v.apps.googleusercontent.com";
+    // const API_KEY = "AIzaSyDOc9wZYiYfHt6Ln_n9_eIxJrlke6RYQwo";
+    // const AUTH_ID =
+    //   "564463627171-7i1scqci790mh9q2qg09hga9neii733v.apps.googleusercontent.com";
+    const API_KEY = api_key;
+    const AUTH_ID = auth_id
+      
     {
       const buttonAuth = document.getElementById("authorize");
       const authBlock = document.querySelector(".auth");
