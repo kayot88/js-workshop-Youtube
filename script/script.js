@@ -1,6 +1,5 @@
 "use strict";
 
-
 document.addEventListener("DOMContentLoaded", () => {
   // экранная клавиатура
   {
@@ -183,8 +182,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  // modal
-  {
+  // youtuber
+
+  const youtuber = () => {
     const divYoutuber = document.querySelector(".youTuberModal");
     const youtuberContainer = document.getElementById("youtuberContainer");
     const youtuberClose = document.getElementById("youtuberClose");
@@ -194,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qh = [2160, 1440, 1080, 720, 480, 360, 240, 144];
 
     const sizeVideo = () => {
+      console.log("sizeVideo");
       let vw = document.documentElement.clientWidth;
       let vh = document.documentElement.clientHeight;
       for (let index = 0; index < qw.length; index++) {
@@ -211,33 +212,36 @@ document.addEventListener("DOMContentLoaded", () => {
           break;
         }
       }
-
-      youtuberItems.forEach(elem => {
-        elem.addEventListener("click", () => {
-          const idVideo = elem.dataset.youtuber;
-          divYoutuber.style.display = "block";
-          const youTuberFrame = document.createElement("iframe");
-          youTuberFrame.src = `https://youtube.com/embed/${idVideo}`;
-          youtuberContainer.insertAdjacentElement("beforeend", youTuberFrame);
-          window.addEventListener("resize", sizeVideo);
-          sizeVideo();
-        });
-      });
     };
+
+    youtuberItems.forEach(elem => {
+      // console.log(elem);
+      return elem.addEventListener("click", () => {
+        const idVideo = elem.dataset.youtuber;
+        // console.log(idVideo);
+        divYoutuber.style.display = "block";
+        const youTuberFrame = document.createElement("iframe");
+        youTuberFrame.src = `https://youtube.com/embed/${idVideo}`;
+        youtuberContainer.insertAdjacentElement("beforeend", youTuberFrame);
+        window.addEventListener("resize", sizeVideo);
+        sizeVideo();
+      });
+    });
     youtuberClose.addEventListener("click", () => {
       divYoutuber.style.display = "";
       youtuberContainer.textContent = "";
       window.removeEventListener("resize", sizeVideo);
     });
-  }
+  };
+
+  youtuber();
+
   // youtube api
   {
-    // const API_KEY = "AIzaSyDOc9wZYiYfHt6Ln_n9_eIxJrlke6RYQwo";
-    // const AUTH_ID =
-    //   "564463627171-7i1scqci790mh9q2qg09hga9neii733v.apps.googleusercontent.com";
-    const API_KEY = api_key;
-    const AUTH_ID = auth_id
-      
+    const API_KEY = "AIzaSyDOc9wZYiYfHt6Ln_n9_eIxJrlke6RYQwo";
+    const AUTH_ID =
+      "564463627171-7i1scqci790mh9q2qg09hga9neii733v.apps.googleusercontent.com";
+    // authenticate
     {
       const buttonAuth = document.getElementById("authorize");
       const authBlock = document.querySelector(".auth");
@@ -267,14 +271,72 @@ document.addEventListener("DOMContentLoaded", () => {
       const errorAuth = err => console.error(err);
       authBlock.style.display = "";
     }
+    // modal
+    {
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        `
+    <div class="youTuberModal">
+      <div id="youtuberClose">&#215;</div>
+      <div id="youtuberContainer"></div>
+    </div>
+    `
+      );
+      // youtuber
+    }
     // requests
     {
+      const getData = document.querySelector(".logo-academy");
       const request = options =>
         gapi.client.youtube.search
           .list(options)
-          .then(response => console.log(response))
-          // .then(render)
-          .catch((err) => console.error(`Some error ${err}`)  )
+          .then(response => {
+            console.log(response.result.items);
+            return response.result.items;
+          })
+          .then(render)
+          .then(youtuber)
+          .catch(err => console.error(`Some error ${err}`));
+
+      const render = data => {
+        const ytWrapper = document.getElementById("yt-wrapper");
+        ytWrapper.textContent = "";
+        data.forEach(items => {
+          const {
+            id: { videoId },
+            snippet: {
+              channelTitle,
+              title,
+              thumbnails: {
+                high: { url }
+              }
+            }
+          } = items;
+          ytWrapper.innerHTML += `
+          <div class="yt" data-youtuber="${videoId}">
+            <div class="yt-thumbnail" style="--aspect-ratio:16/9">
+              <img
+                src="${url}"
+                alt="thumbnail"
+                class="yt-thumbnail__img"
+              />
+            </div>
+            <div class="yt-title">
+              ${title}
+            </div>
+            <div class="yt-channel">${channelTitle}</div>
+          </div>
+          `;
+        });
+      };
+      getData.addEventListener("click", () => {
+        request({
+          part: "snippet",
+          channelId: "UC0yD2Aw5-HOYUyZCu7hyR9Q",
+          order: "date",
+          maxResults: 6
+        });
+      });
     }
   }
 });
