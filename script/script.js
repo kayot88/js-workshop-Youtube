@@ -287,55 +287,165 @@ document.addEventListener("DOMContentLoaded", () => {
     // requests
     {
       const getData = document.querySelector(".logo-academy");
+      const trends = document.getElementById("yt_trend");
+      const likes = document.getElementById("yt_like");
+      const subsc = document.getElementById("yt_subscriptions");
+      const searchForm = document.querySelector(".search-form");
       const request = options =>
-        gapi.client.youtube.search
+        gapi.client.youtube[options.method]
           .list(options)
           .then(response => {
             console.log(response.result.items);
             return response.result.items;
           })
-          .then(render)
-          .then(youtuber)
+          .then(data =>
+            options.method === "subscriptions"
+              ? renderSubsc(data)
+              : render(data)
+          )
+          // .then(youtuber)
           .catch(err => console.error(`Some error ${err}`));
 
+      const renderSubsc = data => {
+        const ytWrapper = document.getElementById("yt-wrapper");
+        ytWrapper.textContent = "";
+        data.forEach(items => {
+          try {
+            const {
+              snippet: {
+                resourceId: { channelId },
+                description,
+                title,
+                thumbnails: {
+                  high: { url }
+                }
+              }
+            } = items;
+            ytWrapper.innerHTML += `
+            <div class="yt" data-youtuber="${channelId}">
+              <div class="yt-thumbnail" style="--aspect-ratio:16/9">
+                <img
+                  src="${url}"
+                  alt="thumbnail"
+                  class="yt-thumbnail__img"
+                />
+              </div>
+              <div class="yt-title">
+                ${title}
+              </div>
+              <div class="yt-channel">${description}</div>
+            </div>
+            `;
+          } catch (err) {
+            console.error(err);
+          }
+        });
+        ytWrapper.querySelectorAll(".yt").forEach(item => {
+          item.addEventListener("click", () => {
+            request({
+              method: "search",
+              part: "snippet",
+              channelId: item.dataset.youtuber,
+              order: "date",
+              maxResults: 50
+            });
+          });
+        });
+      };
       const render = data => {
         const ytWrapper = document.getElementById("yt-wrapper");
         ytWrapper.textContent = "";
         data.forEach(items => {
-          const {
-            id: { videoId },
-            snippet: {
-              channelTitle,
-              title,
-              thumbnails: {
-                high: { url }
+          try {
+            const {
+              id,
+              id: { videoId },
+              snippet: {
+                channelTitle,
+                title,
+                resourceId: {
+                  videoId: likedVideoId,
+                  channelId: subscChannel
+                } = {},
+                thumbnails: {
+                  high: { url }
+                }
               }
-            }
-          } = items;
-          ytWrapper.innerHTML += `
-          <div class="yt" data-youtuber="${videoId}">
-            <div class="yt-thumbnail" style="--aspect-ratio:16/9">
-              <img
-                src="${url}"
-                alt="thumbnail"
-                class="yt-thumbnail__img"
-              />
+            } = items;
+            ytWrapper.innerHTML += `
+            <div class="yt" data-youtuber="${subscChannel ||
+              likedVideoId ||
+              videoId ||
+              id}">
+              <div class="yt-thumbnail" style="--aspect-ratio:16/9">
+                <img
+                  src="${url}"
+                  alt="thumbnail"
+                  class="yt-thumbnail__img"
+                />
+              </div>
+              <div class="yt-title">
+                ${title}
+              </div>
+              <div class="yt-channel">${channelTitle}</div>
             </div>
-            <div class="yt-title">
-              ${title}
-            </div>
-            <div class="yt-channel">${channelTitle}</div>
-          </div>
-          `;
+            `;
+          } catch (err) {
+            console.error(err);
+          }
         });
+        youtuber();
       };
       getData.addEventListener("click", () => {
         request({
+          method: "search",
           part: "snippet",
           channelId: "UC0yD2Aw5-HOYUyZCu7hyR9Q",
           order: "date",
-          maxResults: 6
+          maxResults: 50
         });
+      });
+      trends.addEventListener("click", () => {
+        request({
+          method: "videos",
+          part: "snippet",
+          channelId: "UCoebwHSTvwalADTJhps0emA",
+          chart: "mostPopular",
+          order: "date",
+          maxResults: 50
+        });
+      });
+      likes.addEventListener("click", () => {
+        request({
+          method: "playlistItems",
+          part: "snippet",
+          playlistId: "LL0g2x-zU9pPC7Zy37_DBUXg",
+          maxResults: 50
+        });
+      });
+      subsc.addEventListener("click", () => {
+        request({
+          method: "subscriptions",
+          part: "snippet,contentDetails",
+          maxResults: 50,
+          mine: true
+        });
+      });
+      searchForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const valInput = searchForm.elements[0].value;
+        if (!valInput) {
+          return alert("Enter some value for search");
+        }
+        // console.log(searchForm.elements[0].value);
+        request({
+          method: "search",
+          part: "snippet",
+          order: "relevance",
+          maxResults: 50,
+          q: searchForm.elements[0].value
+        });
+        searchForm.elements[0].value = "";
       });
     }
   }
