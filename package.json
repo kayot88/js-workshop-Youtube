@@ -40,7 +40,7 @@
     "isobject": "^3.0.1",
     "js-tokens": "^4.0.0",
     "jsesc": "^2.5.2",
-    "kind-of": "^6.0.2",
+    "kind-of": "^6.0.3",
     "lodash": "^4.17.15",
     "map-cache": "^0.2.2",
     "map-visit": "^1.0.0",
