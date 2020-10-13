@@ -59,7 +59,7 @@
     "path-is-absolute": "^1.0.1",
     "path-parse": "^1.0.6",
     "pify": "^4.0.1",
-    "posix-character-classes": "^0.1.1",
+    "posix-character-classes": "^1.0.0",
     "process-nextick-args": "^2.0.1",
     "regex-not": "^1.0.2",
     "remove-trailing-separator": "^1.1.0",
